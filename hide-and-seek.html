@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hide and Seek Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+
+        .game-container {
+            display: grid;
+            grid-template-columns: repeat(5, 80px);
+            grid-gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .box {
+            width: 80px;
+            height: 80px;
+            background-color: #87CEEB;
+            border: 2px solid #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .box:hover {
+            background-color: #1E90FF;
+        }
+
+        .hidden {
+            background-color: #228B22 !important; /* Changes color when found */
+            pointer-events: none; /* Disables clicking after it's found */
+        }
+
+        #timer, #attempts {
+            font-size: 18px;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hide and Seek Game</h1>
+    <p>Click on the boxes to find the hidden item!</p>
+    <p id="timer">Time: 0s</p>
+    <p id="attempts">Attempts: 0</p>
+    <button id="resetButton">Reset Game</button>
+    <div class="game-container" id="gameContainer"></div>
+    <audio id="clickSound" src="https://www.soundjay.com/button/beep-07.mp3"></audio>
+    <audio id="winSound" src="https://www.soundjay.com/button/beep-10.mp3"></audio>
+    <script>
+        const gameContainer = document.getElementById("gameContainer");
+        const attemptsDisplay = document.getElementById("attempts");
+        const timerDisplay = document.getElementById("timer");
+        const resetButton = document.getElementById("resetButton");
+        const clickSound = document.getElementById("clickSound");
+        const winSound = document.getElementById("winSound");
+
+        let gridSize = 25;
+        let hiddenIndex, attempts, timer, interval;
+
+        // Initialize the game
+        function initializeGame() {
+            gameContainer.innerHTML = "";
+            attempts = 0;
+            timer = 0;
+            hiddenIndex = Math.floor(Math.random() * gridSize);
+            attemptsDisplay.textContent = `Attempts: ${attempts}`;
+            timerDisplay.textContent = `Time: ${timer}s`;
+
+            // Create the grid
+            for (let i = 0; i < gridSize; i++) {
+                const box = document.createElement("div");
+                box.classList.add("box");
+                box.dataset.index = i;
+
+                // Click event for the boxes
+                box.addEventListener("click", () => {
+                    clickSound.play();
+                    attempts++;
+                    attemptsDisplay.textContent = `Attempts: ${attempts}`;
+                    if (parseInt(box.dataset.index) === hiddenIndex) {
+                        winSound.play();
+                        box.classList.add("hidden");
+                        clearInterval(interval);
+                        alert(`🎉 You found it in ${attempts} attempts and ${timer} seconds!`);
+                    }
+                });
+
+                gameContainer.appendChild(box);
+            }
+
+            // Start the timer
+            clearInterval(interval);
+            interval = setInterval(() => {
+                timer++;
+                timerDisplay.textContent = `Time: ${timer}s`;
+            }, 1000);
+        }
+
+        // Reset the game
+        resetButton.addEventListener("click", initializeGame);
+
+        // Start the game for the first time
+        initializeGame();
+    </script>
+</body>
+</html>
+
